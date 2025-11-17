@@ -1,0 +1,216 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: #282c34; /* Dark background for the modal */
+    padding: 25px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    color: #e0e0e0; /* Light text color */
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh; /* Limit height to viewport */
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #3a3f47; /* Subtle border */
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .modal-header h2 {
+    margin: 0;
+    color: #03dac6; /* Accent color for title */
+    font-size: 1.5rem;
+  }
+  
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #e0e0e0;
+    cursor: pointer;
+    padding: 0 10px;
+    transition: color 0.2s ease-in-out;
+  }
+  
+  .modal-close:hover {
+    color: #ff6b6b; /* Reddish on hover for close */
+  }
+  
+  .modal-body {
+    flex-grow: 1; /* Allows body to take up available space */
+    overflow-y: auto; /* Enables scrolling for long content */
+    margin-bottom: 20px;
+  }
+  
+  .full-response-textarea {
+    width: 100%;
+    height: 100%; /* Make it fill the parent */
+    padding: 15px;
+    border: 1px solid #444;
+    border-radius: 5px;
+    background-color: #1e1e1e; /* Even darker background for textarea */
+    color: #e0e0e0;
+    font-family: 'Fira Code', 'Consolas', 'Monaco', monospace; /* Monospace font for code/output */
+    font-size: 0.95rem;
+    line-height: 1.5;
+    /* Removed: resize: vertical; */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  }
+  
+  .full-response-textarea:focus {
+    outline: none;
+    border-color: #03dac6; /* Accent color on focus */
+    box-shadow: 0 0 0 2px rgba(3, 218, 198, 0.3);
+  }
+  
+  .modal-footer {
+    border-top: 1px solid #3a3f47;
+    padding-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .btn-cancel {
+    background-color: #555;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .btn-cancel:hover {
+    background-color: #777;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .modal-content {
+      width: 95%;
+      padding: 15px;
+    }
+  
+    .modal-header h2 {
+      font-size: 1.2rem;
+    }
+  
+    .modal-close {
+      font-size: 1.5rem;
+    }
+  
+    .full-response-textarea {
+      min-height: 200px;
+      font-size: 0.85rem;
+    }
+  }
+  
+  /* Markdown specific styling */
+  .markdown-body {
+    padding: 15px; /* Add padding to the markdown body */
+    background-color: #1e1e1e; /* Background for markdown content */
+    border-radius: 5px;
+    color: #e0e0e0; /* Default text color */
+    font-family: sans-serif; /* Default font for markdown */
+    line-height: 1.6;
+  }
+  
+  .markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    color: #03dac6; /* Accent color for headings */
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    line-height: 1.2;
+  }
+  
+  .markdown-body h1 { font-size: 2em; border-bottom: 1px solid #3a3f47; padding-bottom: 0.3em; }
+  .markdown-body h2 { font-size: 1.75em; border-bottom: 1px solid #3a3f47; padding-bottom: 0.3em; }
+  .markdown-body h3 { font-size: 1.5em; }
+  .markdown-body h4 { font-size: 1.25em; }
+  .markdown-body h5 { font-size: 1em; }
+  .markdown-body h6 { font-size: 0.875em; color: #ccc; }
+  
+  .markdown-body p {
+    margin-bottom: 1em;
+  }
+  
+  .markdown-body ul, .markdown-body ol {
+    margin-bottom: 1em;
+    padding-left: 2em;
+  }
+  
+  .markdown-body li {
+    margin-bottom: 0.5em;
+  }
+  
+  .markdown-body code {
+    font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+    background-color: #3a3f47;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    color: #e0e0e0;
+  }
+  
+  .markdown-body pre {
+    background-color: #2d2d2d;
+    padding: 1em;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin-bottom: 1em;
+  }
+  
+  .markdown-body pre code {
+    background: none;
+    padding: 0;
+    color: #e0e0e0;
+  }
+  
+  .markdown-body a {
+    color: #03dac6;
+    text-decoration: none;
+  }
+  
+  .markdown-body a:hover {
+    text-decoration: underline;
+  }
+  
+  .markdown-body blockquote {
+    border-left: 4px solid #03dac6;
+    padding-left: 1em;
+    margin-left: 0;
+    color: #ccc;
+  }
+  
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+  }
+  
+  .markdown-body th, .markdown-body td {
+    border: 1px solid #3a3f47;
+    padding: 0.5em;
+    text-align: left;
+  }
+  
+  .markdown-body th {
+    background-color: #3a3f47;
+    color: #e0e0e0;
+  }
