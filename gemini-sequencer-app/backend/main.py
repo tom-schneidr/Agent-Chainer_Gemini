@@ -9,6 +9,7 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from collections import deque
 import google.api_core.exceptions
+from google.ai.generativelanguage_v1beta.types import Tool
 
 load_dotenv()
 
@@ -84,6 +85,20 @@ async def get_gemini_stream(message: str, history: list, model: str):
     for current_model in models_to_try:
         try:
             print(f"Attempting to use model: {current_model}")
+            # Note: Chat stream currently doesn't support the optional grounding flag from frontend yet.
+            # If we wanted to add it, we'd need to pass it in the request.
+            # For now, we leave it as default (no grounding) or we can enable it globally if requested.
+            # The user request was "add grounding ... to all ai requests" initially, but then "optional checkbox for nodes".
+            # Chat stream is not a node, so maybe it should have it too?
+            # The user said "optional checkbox for nodes".
+            # I will leave chat stream as is (no grounding) unless specified, 
+            # OR I can enable it by default if that was the original intent for "all requests" before the "optional" refinement.
+            # The "optional" refinement was specifically "for nodes".
+            # So "all requests" might still imply chat should have it?
+            # Let's stick to the plan which only mentioned nodes for the optional part, but the original request was "all".
+            # However, without a checkbox in chat UI, I shouldn't force it if it costs/adds latency.
+            # I'll leave it off for chat for now to be safe, or I can add it if I want to be consistent.
+            # Let's just fix the error in run_sequence_graph first.
             generative_model = genai.GenerativeModel(current_model)
             chat = generative_model.start_chat(history=sanitized_history)
             response = chat.send_message(message, stream=True)
@@ -137,7 +152,29 @@ async def run_sequence_graph(request: Request):
 
     try:
         print(f"Attempting sequence with model: {model_name}")
-        model = genai.GenerativeModel(model_name)
+        
+        # We'll instantiate the model inside the loop or just before generation if we need per-node config,
+        # but the GenerativeModel object itself doesn't hold state per se for `generate_content`.
+        # However, `tools` are configured at initialization.
+        # So we might need to instantiate it differently depending on whether tools are needed.
+        # For simplicity/performance, we can instantiate two versions or just instantiate on demand.
+        # Given the request is per-node, let's instantiate on demand if needed, or just use one if all are same.
+        # Actually, `generate_content` supports `tools` override in some SDK versions, but standard way is init.
+        # Let's just instantiate inside the loop for custom nodes if we want to be safe, or check if we can pass tools to generate_content.
+        # Checking docs (mental check): generate_content usually takes `tools` in some versions, but `configure` is global.
+        # The `GenerativeModel` constructor takes `tools`.
+        # Let's instantiate a "grounded_model" and a "standard_model" to avoid re-init every time if possible,
+        # OR just init per node to be safe and support the per-node flag.
+        
+        # Better approach: Just init per node execution if it's a custom node.
+        # But we want to reuse the model object if possible.
+        # Let's keep the default one, and create a grounded one if needed.
+        
+        default_model = genai.GenerativeModel(model_name)
+        
+        # Use the Tool object to avoid "Unknown field for FunctionDeclaration" error
+        grounding_tool = Tool(google_search=Tool.GoogleSearch())
+        grounded_model = genai.GenerativeModel(model_name, tools=[grounding_tool])
         
         node_outputs = {}
         node_map = {n['id']: n for n in nodes}
@@ -193,7 +230,12 @@ async def run_sequence_graph(request: Request):
                     full_prompt = full_prompt.replace(f'{{{{{placeholder}}}}}', str(value))
 
                 try:
-                    response = model.generate_content(full_prompt)
+                    # Check if this node requests grounding
+                    use_grounding = current_node['data'].get('googleSearch', False)
+                    model_to_use = grounded_model if use_grounding else default_model
+                    
+                    print(f"Generating for node {node_id} (Grounding: {use_grounding})")
+                    response = model_to_use.generate_content(full_prompt)
                     node_outputs[node_id] = response.text
                 except google.api_core.exceptions.ResourceExhausted as e:
                     print(f"Rate limit hit on node {node_id} with model {model_name}.")

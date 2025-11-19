@@ -18,7 +18,7 @@ import PromptEditModal from './PromptEditModal';
 import FullResponseModal from './FullResponseModal'; // Import FullResponseModal
 import { runSequenceGraph } from '../lib/api';
 
-const nodeTypes = { 
+const nodeTypes = {
   custom: (props) => <CustomNode {...props} onViewOutput={props.data.onViewOutput} />,
   userInput: UserInputNode,
 };
@@ -143,12 +143,12 @@ function Sequencer() {
   );
 
   const handleSavePrompt = useCallback(
-    (newPrompt, newName) => {
+    (newPrompt, newName, newGoogleSearch) => {
       if (editingNode) {
         setNodes((nds) =>
           nds.map((n) =>
             n.id === editingNode.id
-              ? { ...n, data: { ...n.data, prompt: newPrompt, name: newName } }
+              ? { ...n, data: { ...n.data, prompt: newPrompt, name: newName, googleSearch: newGoogleSearch } }
               : n
           )
         );
@@ -200,7 +200,7 @@ function Sequencer() {
         } catch (error) {
           alert('Failed to load file. Make sure it is a valid sequencer setup file.');
           console.error('Failed to parse file:', error);
-        } 
+        }
       };
       reader.readAsText(file);
     }
@@ -269,12 +269,13 @@ function Sequencer() {
           <Controls />
         </ReactFlow>
       </div>
-      
+
       <PromptEditModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         initialPrompt={editingNode?.data?.prompt || ''}
         initialName={editingNode?.data?.name || ''}
+        initialGoogleSearch={editingNode?.data?.googleSearch || false}
         onSave={handleSavePrompt}
         nodeId={editingNode?.id || ''}
         connectedInputs={edges
@@ -314,11 +315,11 @@ function Sequencer() {
 
 
 function SequencerWrapper() {
-    return (
-      <ReactFlowProvider>
-        <Sequencer />
-      </ReactFlowProvider>
-    );
-  }
-  
-  export default SequencerWrapper;
+  return (
+    <ReactFlowProvider>
+      <Sequencer />
+    </ReactFlowProvider>
+  );
+}
+
+export default SequencerWrapper;

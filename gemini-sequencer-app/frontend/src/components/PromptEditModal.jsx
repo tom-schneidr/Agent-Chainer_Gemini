@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import './PromptEditModal.css';
 
-function PromptEditModal({ isOpen, onClose, initialPrompt, initialName, onSave, nodeId, connectedInputs = [] }) {
+function PromptEditModal({ isOpen, onClose, initialPrompt, initialName, initialGoogleSearch, onSave, nodeId, connectedInputs = [] }) {
   const [prompt, setPrompt] = useState(initialPrompt || '');
   const [name, setName] = useState(initialName || '');
+  const [googleSearch, setGoogleSearch] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(0);
 
   useEffect(() => {
     if (isOpen) {
       setPrompt(initialPrompt || '');
       setName(initialName || '');
+      setGoogleSearch(initialGoogleSearch || false);
     }
-  }, [isOpen, initialPrompt, initialName]);
+  }, [isOpen, initialPrompt, initialName, initialGoogleSearch]);
 
   const handleInsertPlaceholder = (placeholder) => {
     const newPrompt =
@@ -32,7 +34,7 @@ function PromptEditModal({ isOpen, onClose, initialPrompt, initialName, onSave, 
   };
 
   const handleSave = () => {
-    onSave(prompt, name);
+    onSave(prompt, name, googleSearch);
     onClose();
   };
 
@@ -47,7 +49,7 @@ function PromptEditModal({ isOpen, onClose, initialPrompt, initialName, onSave, 
             ×
           </button>
         </div>
-        
+
         <div className="modal-body">
           <div className="prompt-editor">
             <label>Name:</label>
@@ -68,6 +70,17 @@ function PromptEditModal({ isOpen, onClose, initialPrompt, initialName, onSave, 
               rows={12}
               autoFocus
             />
+            <div className="checkbox-container" style={{ marginTop: '10px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={googleSearch}
+                  onChange={(e) => setGoogleSearch(e.target.checked)}
+                  style={{ marginRight: '8px' }}
+                />
+                Enable Google Search Grounding
+              </label>
+            </div>
           </div>
 
           <div className="placeholder-controls">
